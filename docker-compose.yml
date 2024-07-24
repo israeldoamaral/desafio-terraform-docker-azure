@@ -2,27 +2,37 @@ version: '3.8'
 
 services:
   wordpress:
-    image: wordpress:latest
+    image: wordpress:php8.3-fpm-alpine
     restart: always
     ports:
       - "80:80"
     environment:
       WORDPRESS_DB_HOST: db
       WORDPRESS_DB_USER: root
-      WORDPRESS_DB_PASSWORD: GAud4mZby8F3SD6P
+      WORDPRESS_DB_PASSWORD_FILE: /run/secrets/wordpress_password
       WORDPRESS_DB_NAME: wordpress
     volumes:
       - wordpress:/var/www/html
+    secrets:
+      - wordpress_db_password
 
   db:
     image: mysql:5.7
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: GAud4mZby8F3SD6P
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_password
       MYSQL_DATABASE: wordpress
     volumes:
       - db_data:/var/lib/mysql
+    secrets:
+      - mysql_root_password
 
 volumes:
   wordpress:
   db_data:
+
+secrets:
+  mysql_root_password:
+    file: ./secrets/mysql_password.txt
+  wordpress_db_password:
+    file: ./secrets/wordpress_password.txt
